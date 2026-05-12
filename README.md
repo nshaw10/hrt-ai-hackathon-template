@@ -1,6 +1,6 @@
 # 🌟 Calm Corner Check-In
 
-A child-friendly digital check-in tool for behavior support specialists in afterschool programs. Students identify their emotions using the Zones of Regulation framework and choose a calm-down strategy from the calm corner — while specialists quietly track patterns and add private notes from a password-protected dashboard.
+A child-friendly digital check-in tool for Teachers and Admin to learn more about their childs needs. Students identify their emotions using the Zones of Regulation framework and choose a calm-down strategy from the calm corner — while Staff and Admin quietly track patterns and add private notes from a password-protected dashboard.
 
 ## What It Does
 

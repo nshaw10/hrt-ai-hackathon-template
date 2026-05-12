@@ -42,16 +42,6 @@
       ]
     },
     {
-      "name": "1st-3rd: Lemon Peppa",
-      "bg_color": "#FFFFFF",
-      "text_color": "#333333",
-      "grades": [
-        "1st",
-        "2nd",
-        "3rd"
-      ]
-    },
-    {
       "name": "2/3A: KK",
       "bg_color": "#4169E1",
       "text_color": "#ffffff",
@@ -95,6 +85,16 @@
         "6th",
         "7th",
         "8th"
+      ]
+    },
+    {
+      "name": "1st-3rd: Lemon Peppa",
+      "bg_color": "#e0e0e0",
+      "text_color": "#333333",
+      "grades": [
+        "1st",
+        "2nd",
+        "3rd"
       ]
     }
   ]

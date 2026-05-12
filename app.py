@@ -159,9 +159,11 @@ for key, default in [
         st.session_state[key] = default
 
 # Auto-reset after 60 s of inactivity — reloads page = fresh session
+# Also locks staff dashboard when sidebar is closed
 components.html("""
 <script>
 (function() {
+    // ── Idle timer ──────────────────────────────────────
     var IDLE_MS = 60000;
     var timer;
     function reload() { window.parent.location.reload(); }
@@ -170,6 +172,26 @@ components.html("""
         try { window.parent.document.addEventListener(e, resetTimer, true); } catch(err) {}
     });
     resetTimer();
+
+    // ── Auto-lock when sidebar closes ───────────────────
+    function watchSidebar() {
+        var doc = window.parent.document;
+        var sidebar = doc.querySelector('section[data-testid="stSidebar"]');
+        if (!sidebar) { setTimeout(watchSidebar, 400); return; }
+
+        var wasOpen = sidebar.getBoundingClientRect().width > 50;
+
+        new window.parent.ResizeObserver(function(entries) {
+            var isOpen = entries[0].contentRect.width > 50;
+            if (wasOpen && !isOpen) {
+                if (doc.getElementById('edu-auth-active')) {
+                    window.parent.location.reload();
+                }
+            }
+            wasOpen = isOpen;
+        }).observe(sidebar);
+    }
+    watchSidebar();
 })();
 </script>
 """, height=0)
@@ -755,6 +777,7 @@ with st.sidebar:
             else:
                 st.error("Incorrect password.")
     else:
+        st.markdown('<div id="edu-auth-active" style="display:none;"></div>', unsafe_allow_html=True)
         filepath = "data_ai/checkins.csv"
 
         if os.path.exists(filepath):
