@@ -62,21 +62,10 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-CONFIG_PATH = "data_ai/program_config.json"
+CONFIG_PATH = "data_ai/template_config.json"
 
-_DEFAULT_GROUPS = [
-    {"name": "TKA",                  "bg_color": "#FF69B4", "text_color": "#ffffff", "grades": ["TK"]},
-    {"name": "TKB",                  "bg_color": "#FFB6C1", "text_color": "#555555", "grades": ["TK"]},
-    {"name": "KA",                   "bg_color": "#FF8C00", "text_color": "#ffffff", "grades": ["K"]},
-    {"name": "KB",                   "bg_color": "#FFDAB9", "text_color": "#555555", "grades": ["K"]},
-    {"name": "1st: Beam",            "bg_color": "#DC143C", "text_color": "#ffffff", "grades": ["1st"]},
-    {"name": "1st-3rd: Lemon Peppa", "bg_color": "#FFFFFF", "text_color": "#333333", "grades": ["1st", "2nd", "3rd"]},
-    {"name": "2/3A: KK",             "bg_color": "#4169E1", "text_color": "#ffffff", "grades": ["2nd", "3rd"]},
-    {"name": "2/3B: Atlantic",       "bg_color": "#228B22", "text_color": "#ffffff", "grades": ["2nd", "3rd"]},
-    {"name": "4/5A: Spider",         "bg_color": "#00008B", "text_color": "#ffffff", "grades": ["4th", "5th"]},
-    {"name": "4/5B: Hoopz",          "bg_color": "#1a1a1a", "text_color": "#ffffff", "grades": ["4th", "5th"]},
-    {"name": "MS: Snapdragon",       "bg_color": "#FFD700", "text_color": "#333333", "grades": ["6th", "7th", "8th"]},
-]
+# No groups pre-loaded — set them up via the Staff Dashboard > Program Settings
+_DEFAULT_GROUPS = []
 
 
 def load_config():
@@ -86,7 +75,7 @@ def load_config():
                 return json.load(f)
         except Exception:
             pass
-    return {"password": "teacher123", "groups": _DEFAULT_GROUPS}
+    return {"password": "changeme", "groups": _DEFAULT_GROUPS}
 
 
 def save_config(cfg):
@@ -154,9 +143,34 @@ for key, default in [
     ("educator_authenticated", False),
     ("selected_student", None),
     ("editing_group", None),
+    ("welcome_shown", False),
 ]:
     if key not in st.session_state:
         st.session_state[key] = default
+
+
+@st.dialog("👋 Welcome — Staff Setup")
+def show_welcome():
+    cfg = load_config()
+    st.markdown(
+        "<div style='font-size:1.05rem;'>To access the <strong>Staff Dashboard</strong>, "
+        "open the sidebar and enter the staff password:</div>",
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        f"<div style='font-size:2rem;font-weight:900;text-align:center;"
+        f"letter-spacing:4px;padding:14px;background:#f0f4ff;border-radius:12px;"
+        f"border:2px solid #3498db;margin:14px 0;color:#2c3e50;'>{cfg['password']}</div>",
+        unsafe_allow_html=True,
+    )
+    st.caption("Change this anytime in Staff Dashboard → Program Settings → Password.")
+    if st.button("Got it! ✓", use_container_width=True, type="primary"):
+        st.session_state.welcome_shown = True
+        st.rerun()
+
+
+if not st.session_state.welcome_shown:
+    show_welcome()
 
 # Auto-reset after 60 s of inactivity — reloads page = fresh session
 components.html("""
@@ -348,7 +362,7 @@ ZONES = {
 
 def save_checkin(name, grade, rec_group, referral, zone, feeling, strategy, notes, start_time):
     os.makedirs("data_ai", exist_ok=True)
-    filepath = "data_ai/checkins.csv"
+    filepath = "data_ai/template_checkins.csv"
     end_time = datetime.now()
     duration = round((end_time - start_time).total_seconds() / 60, 1) if start_time else None
     clean_zone     = zone.split()[1] if zone else zone
@@ -449,41 +463,41 @@ elif st.session_state.step == 1:
                              type="primary" if selected else "secondary"):
                     if st.session_state.grade != g:
                         st.session_state.grade = g
-                        st.session_state.rec_group = None  # reset when grade changes
+                        st.session_state.rec_group = None
                     st.rerun()
 
     st.write("")
     if st.session_state.grade:
         available = GRADE_TO_GROUPS.get(st.session_state.grade, [])
 
-        # Auto-select if only one group for this grade
-        if len(available) == 1 and st.session_state.rec_group != available[0]:
-            st.session_state.rec_group = available[0]
-            st.rerun()
-
-        # Clear rec_group if it no longer applies to the selected grade
-        if st.session_state.rec_group and st.session_state.rec_group not in available:
-            st.session_state.rec_group = None
-            st.rerun()
-
-        if len(available) > 1:
-            st.markdown("**Which rec group are you in?**")
-            rec_groups = [(g, g) for g in available]
-            pairs = [rec_groups[i:i+2] for i in range(0, len(rec_groups), 2)]
-            for pair in pairs:
-                cols = st.columns(2)
-                for j, (key, label) in enumerate(pair):
-                    with cols[j]:
-                        if rec_group_button(label, f"rg_{key}"):
-                            st.session_state.rec_group = key
-                            st.rerun()
+        if not available:
+            st.info("No groups have been set up yet. A staff member needs to add groups in the Staff Dashboard → Program Settings.")
         else:
-            # Single group — show it as confirmation, no choice needed
-            st.markdown(
-                f"<div style='text-align:center;font-size:1rem;color:#555;margin-top:8px;'>"
-                f"Rec group: <strong>{available[0]}</strong></div>",
-                unsafe_allow_html=True,
-            )
+            if len(available) == 1 and st.session_state.rec_group != available[0]:
+                st.session_state.rec_group = available[0]
+                st.rerun()
+
+            if st.session_state.rec_group and st.session_state.rec_group not in available:
+                st.session_state.rec_group = None
+                st.rerun()
+
+            if len(available) > 1:
+                st.markdown("**Which class or group are you in?**")
+                rec_groups = [(g, g) for g in available]
+                pairs = [rec_groups[i:i+2] for i in range(0, len(rec_groups), 2)]
+                for pair in pairs:
+                    cols = st.columns(2)
+                    for j, (key, label) in enumerate(pair):
+                        with cols[j]:
+                            if rec_group_button(label, f"rg_{key}"):
+                                st.session_state.rec_group = key
+                                st.rerun()
+            else:
+                st.markdown(
+                    f"<div style='text-align:center;font-size:1rem;color:#555;margin-top:8px;'>"
+                    f"Group: <strong>{available[0]}</strong></div>",
+                    unsafe_allow_html=True,
+                )
 
     st.write("")
     if st.session_state.grade and st.session_state.rec_group:
@@ -509,7 +523,7 @@ elif st.session_state.step == 2:
 
     referral_cards = [
         ("ref_self",   "Self — asked to come",        "🙋",   "I asked to come",      "I knew I needed a break",         "#e8f8f5", "#1abc9c", "#148f77"),
-        ("ref_leader", "Referred — rec leader sent",  "👨‍🏫",  "My rec leader sent me", "My leader thought I needed a break", "#fef5e7", "#f39c12", "#b7770d"),
+        ("ref_leader", "Referred by staff",  "👨‍🏫",  "A staff member sent me", "Staff thought I needed a break", "#fef5e7", "#f39c12", "#b7770d"),
     ]
 
     cols = st.columns(2)
@@ -739,7 +753,7 @@ elif st.session_state.step == 6:
 # Sidebar — Educator Dashboard (password protected)
 # ──────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("### 🍎 Specialist Dashboard")
+    st.markdown("### 🍎 Staff Dashboard")
 
     if not st.session_state.educator_authenticated:
         st.markdown(
@@ -755,7 +769,7 @@ with st.sidebar:
             else:
                 st.error("Incorrect password.")
     else:
-        filepath = "data_ai/checkins.csv"
+        filepath = "data_ai/template_checkins.csv"
 
         if os.path.exists(filepath):
             df = normalize_df(pd.read_csv(filepath))
@@ -855,6 +869,9 @@ with st.sidebar:
             tab_grps, tab_pw = st.tabs(["Groups", "Password"])
 
             with tab_grps:
+                if not grps:
+                    st.info("No groups yet. Add your first group below.")
+
                 for i, grp in enumerate(grps):
                     c1, c2, c3 = st.columns([4, 1, 1])
                     with c1:

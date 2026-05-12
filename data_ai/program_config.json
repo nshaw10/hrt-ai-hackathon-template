@@ -1,0 +1,101 @@
+{
+  "password": "teacher123",
+  "groups": [
+    {
+      "name": "TKA",
+      "bg_color": "#FF69B4",
+      "text_color": "#ffffff",
+      "grades": [
+        "TK"
+      ]
+    },
+    {
+      "name": "TKB",
+      "bg_color": "#FFB6C1",
+      "text_color": "#555555",
+      "grades": [
+        "TK"
+      ]
+    },
+    {
+      "name": "KA",
+      "bg_color": "#FF8C00",
+      "text_color": "#ffffff",
+      "grades": [
+        "K"
+      ]
+    },
+    {
+      "name": "KB",
+      "bg_color": "#FFDAB9",
+      "text_color": "#555555",
+      "grades": [
+        "K"
+      ]
+    },
+    {
+      "name": "1st: Beam",
+      "bg_color": "#DC143C",
+      "text_color": "#ffffff",
+      "grades": [
+        "1st"
+      ]
+    },
+    {
+      "name": "1st-3rd: Lemon Peppa",
+      "bg_color": "#FFFFFF",
+      "text_color": "#333333",
+      "grades": [
+        "1st",
+        "2nd",
+        "3rd"
+      ]
+    },
+    {
+      "name": "2/3A: KK",
+      "bg_color": "#4169E1",
+      "text_color": "#ffffff",
+      "grades": [
+        "2nd",
+        "3rd"
+      ]
+    },
+    {
+      "name": "2/3B: Atlantic",
+      "bg_color": "#228B22",
+      "text_color": "#ffffff",
+      "grades": [
+        "2nd",
+        "3rd"
+      ]
+    },
+    {
+      "name": "4/5A: Spider",
+      "bg_color": "#00008B",
+      "text_color": "#ffffff",
+      "grades": [
+        "4th",
+        "5th"
+      ]
+    },
+    {
+      "name": "4/5B: Hoopz",
+      "bg_color": "#1a1a1a",
+      "text_color": "#ffffff",
+      "grades": [
+        "4th",
+        "5th"
+      ]
+    },
+    {
+      "name": "MS: Snapdragon",
+      "bg_color": "#FFD700",
+      "text_color": "#333333",
+      "grades": [
+        "6th",
+        "7th",
+        "8th"
+      ]
+    }
+  ]
+}
